@@ -14,22 +14,33 @@
 sequenceDiagram
     participant User as 使用者
     participant ESP32 as ESP32 + 超音波
-    participant Flask as Flask Server
+    participant Server as Flask Server
     participant DB as SQLite DB
-    participant Streamlit as Streamlit Dashboard
+    participant Dashboard as Streamlit Dashboard
 
-    User->>ESP32: 停入車位
-    ESP32->>ESP32: 邊緣計算距離 Threshold
-    Note over ESP32: 判定狀態為 occupied
-    ESP32->>Flask: HTTP POST ({"spot_id": "A1", "status": 1})
-    Flask->>DB: 寫入 A1 佔用狀態與時間
-    Note over DB: 更新狀態
-    DB-->>Flask: 成功確認
-    Flask-->>ESP32: HTTP 200 OK
-    
-    Streamlit->>DB: 每秒同步讀取數據
-    DB-->>Streamlit: 傳回最新 A1 狀態 (1)
-    Note over Streamlit: 車位 A1 變色 (綠 ➡️ 紅)
+    rect rgb(240, 240, 240)
+        Note over User, ESP32: 微觀偵測 (邊緣感測流)
+        User->>ESP32: 停入車位
+        activate ESP32
+        ESP32->>ESP32: 邊緣計算距離 Threshold
+        Note right of ESP32: 判定狀態為 occupied
+        ESP32->>Server: HTTP POST ({"spot_id": "A1", "status": 1})
+        activate Server
+        Server->>DB: 寫入 A1 佔用狀態與時間
+        activate DB
+        Note over DB: 更新狀態
+        DB-->>Server: 成功確認
+        deactivate DB
+        Server-->>ESP32: HTTP 200 OK
+        deactivate Server
+        deactivate ESP32
+    end
+
+    Dashboard->>DB: 每秒同步讀取數據
+    activate DB
+    DB-->>Dashboard: 傳回最新 A1 狀態 (1)
+    deactivate DB
+    Note over Dashboard: 車位 A1 變色 (綠➡️紅)
 ```
 
 本系統採用標準物聯網三層式架構：
