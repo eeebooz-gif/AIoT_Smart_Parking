@@ -16,6 +16,11 @@ def init_db():
 @app.route('/update_parking', methods=['POST'])
 def update_parking():
     data = request.get_json()
+    
+    # 簡單防護：確保收到的 JSON 有包含必填欄位，避免伺服器報錯崩潰
+    if not data or 'spot_id' not in data or 'status' not in data:
+        return jsonify({"error": "Invalid payload format"}), 400
+        
     spot_id = data.get('spot_id')
     status = data.get('status')
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")

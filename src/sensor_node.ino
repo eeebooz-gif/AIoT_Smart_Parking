@@ -33,11 +33,13 @@ void loop() {
   delayMicroseconds(10);
   digitalWrite(trigPin, LOW);
   
-  long duration = pulseIn(echoPin, HIGH);
+  // 測量距離 (加入 30000 微秒超時設定，約可偵測 5 公尺範圍，避免無障礙物時程式卡死)
+  long duration = pulseIn(echoPin, HIGH, 30000);
   int distance = duration * 0.034 / 2;
 
-  // 判斷車位狀態 (距離小於 10cm 代表有車)
-  int status = (distance < 10) ? 1 : 0;
+  // 判斷車位狀態 (距離大於0且小於10cm才代表有車)
+  // [重要除錯] 因為 pulseIn 若超時會回傳 0，若只寫 distance < 10 會導致超時被「誤判成有車」
+  int status = (distance > 0 && distance < 10) ? 1 : 0;
 
   // 發送 HTTP POST 請求
   if (WiFi.status() == WL_CONNECTED) {
