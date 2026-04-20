@@ -4,8 +4,8 @@
 // Wi-Fi 設定
 const char* ssid = "YOUR_WIFI_SSID";
 const char* password = "YOUR_WIFI_PASSWORD";
-// Flask 伺服器的 IP 位置 (請改成你電腦的區域網路 IP)
-const char* serverName = "http://192.168.1.X:5000/update_parking";
+// Flask 伺服器的 IP 位置 (已自動幫您抓取您目前的區域網路 IP)
+const char* serverName = "http://10.10.53.98:5000/update_parking";
 
 // 超音波腳位設定
 const int trigPin = 5;
